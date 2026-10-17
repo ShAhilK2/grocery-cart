@@ -112,11 +112,11 @@ export default function CheckoutPageComponent() {
 
                   <div className="mt-2 flex items-center gap-2">
                     <span className="font-medium text-primary">
-                      ${product.offerPrice.toFixed(2)}
+                    ₹{product.offerPrice.toFixed(2)}
                     </span>
 
                     <span className="text-xs text-muted line-through">
-                      ${product.price.toFixed(2)}
+                    ₹{product.price.toFixed(2)}
                     </span>
                   </div>
 
@@ -148,7 +148,7 @@ export default function CheckoutPageComponent() {
                 <span className="mr-2 text-sm text-muted sm:hidden">
                   Subtotal:
                 </span>
-                ${(product.offerPrice * product.quantity).toFixed(2)}
+              ₹{(product.offerPrice * product.quantity).toFixed(2)}
               </p>
 
               {/* Delete */}
@@ -265,7 +265,7 @@ export default function CheckoutPageComponent() {
           <p className="flex justify-between text-lg font-medium text-text">
             <span>Total Amount</span>
             <span className="text-primary">
-              ${total.toFixed(2)}
+            ₹{total.toFixed(2)}
             </span>
           </p>
         </div>

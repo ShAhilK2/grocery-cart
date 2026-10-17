@@ -107,7 +107,7 @@ export default function CustomersPage() {
                 </td>
 
                 <td className="px-5 py-4 font-medium text-primary">
-                  ${customer.totalSpent.toFixed(2)}
+                ₹{customer.totalSpent.toFixed(2)}
                 </td>
               </tr>
             ))}

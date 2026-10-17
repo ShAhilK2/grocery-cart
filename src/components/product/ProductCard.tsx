@@ -40,9 +40,9 @@ export default function ProductCard({product}:ProductCardProps) {
      
         <div className="flex items-end justify-between mt-3">
           <p className="md:text-xl text-base font-medium text-primary">
-            ${product.price}{" "}
+          ₹{product.price}{" "}
             <span className="text-gray-500/60 md:text-sm text-xs line-through">
-              ${product.oldPrice}
+            ₹{product.oldPrice}
             </span>
           </p>
           <div className="text-primary">

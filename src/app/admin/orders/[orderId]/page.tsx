@@ -153,11 +153,11 @@ export default function OrderPage() {
 
                   <div className="flex flex-col items-end justify-center">
                     <p className="font-medium text-text">
-                      ${(item.price * item.quantity).toFixed(2)}
+                    ₹{(item.price * item.quantity).toFixed(2)}
                     </p>
 
                     <p className="mt-1 text-xs text-muted">
-                      ${item.price.toFixed(2)} each
+                    ₹{item.price.toFixed(2)} each
                     </p>
                   </div>
                 </div>

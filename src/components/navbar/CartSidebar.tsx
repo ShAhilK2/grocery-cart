@@ -142,7 +142,7 @@ export default function CartSidebar({
 
                     {/* Price */}
                     <p className="text-sm font-semibold text-text">
-                      ${(item.price * item.quantity).toFixed(2)}
+                    ₹{(item.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -157,7 +157,7 @@ export default function CartSidebar({
             <span className="text-sm text-muted">Subtotal</span>
 
             <span className="text-lg font-semibold text-text">
-              $17.96
+            ₹17.96
             </span>
           </div>
 

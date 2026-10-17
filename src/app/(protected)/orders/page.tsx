@@ -230,7 +230,7 @@ export default function OrdersPage() {
                     <div className="flex justify-between gap-4">
                       <span className="text-muted">Total</span>
                       <span className="font-semibold text-text">
-                        ${order.amount.toFixed(2)}
+                      ₹{order.amount.toFixed(2)}
                       </span>
                     </div>
 

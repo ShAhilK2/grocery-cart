@@ -6,7 +6,7 @@ import { user } from "./auth-schema";
 
 // tables
 
-export const product = pgTable("products",{
+export const product = pgTable("product",{
   id : text("id").primaryKey(),
   slug : text("slug").notNull().unique(),
   name : text("name").notNull(),

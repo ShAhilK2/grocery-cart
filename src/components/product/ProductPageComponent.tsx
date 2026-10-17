@@ -89,11 +89,11 @@ export default function ProductPageComponent() {
           {/* Price */}
           <div className="mt-5">
             <p className="text-sm text-muted line-through sm:text-base">
-              ${product.price}
+            ₹{product.price}
             </p>
 
             <p className="mt-1 text-2xl font-medium text-primary sm:text-3xl">
-              ${product.offerPrice}
+            ₹{product.offerPrice}
             </p>
           </div>
 

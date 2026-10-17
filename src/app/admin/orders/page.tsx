@@ -111,7 +111,7 @@ export default function OrdersPage() {
                 </p>
 
                 <p className="font-medium text-text">
-                  ${order.amount.toFixed(2)}
+                ₹{order.amount.toFixed(2)}
                 </p>
 
                 <p className="text-muted">
@@ -174,7 +174,7 @@ export default function OrdersPage() {
                   <div>
                     <p className="text-xs text-muted">Amount</p>
                     <p className="mt-1 font-medium text-text">
-                      ${order.amount.toFixed(2)}
+                    ₹{order.amount.toFixed(2)}
                     </p>
                   </div>
 

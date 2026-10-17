@@ -1,22 +1,18 @@
 
 "use client";
 
+import { categories } from "@/constants/categories";
 import Image from "next/image";
 import { ChangeEvent, useState } from "react";
+import toast from "react-hot-toast";
 import { FiImage, FiTrash2, FiUploadCloud } from "react-icons/fi";
 
-const categories = [
-  "Fresh Fruits",
-  "Vegetables",
-  "Baked Foods",
-  "Cereals",
-  "Dairy Products",
-  "Drinks",
-  "Instant Foods",
-];
+
+
 
 export default function AddProduct() {
-  const [images, setImages] = useState<string[]>([]);
+  const [images, setImages] = useState<File[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -26,11 +22,9 @@ export default function AddProduct() {
     const remainingSlots = 4 - images.length;
     const selectedFiles = files.slice(0, remainingSlots);
 
-    const newImages = selectedFiles.map((file) =>
-      URL.createObjectURL(file)
-    );
+    setImages((prev) => [...prev, ...selectedFiles]);
 
-    setImages((prev) => [...prev, ...newImages]);
+   
 
     e.target.value = "";
   };
@@ -39,15 +33,52 @@ export default function AddProduct() {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const form = e.currentTarget;
+   
+    
     if (images.length === 0) {
-      alert("Please upload at least one product image.");
+      toast.error("Please upload at least one product image.");
       return;
     }
+    setLoading(true);
 
-    // Add product logic here
+    try {
+      // Add product logic here
+       const formData = new FormData(form);
+
+      //  why for each? because we are appending multiple images
+      // why not map? because map returns an array, but we want to append each image to the form data
+       images.forEach((image) => {
+        formData.append("images", image);
+       });
+
+       const response = await fetch("/api/product", {
+        method: "POST",
+        body: formData,
+       });
+
+       const data = await response.json();
+
+
+       if (!response.ok) {
+        toast.error(data.message || "Failed to add products");
+        return;
+       }
+
+
+       toast.success("Product added successfully");
+       form.reset();
+       setImages([]);
+
+    } catch (error) {
+      toast.error("Failed to add product");
+      return;
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -76,6 +107,7 @@ export default function AddProduct() {
 
             <input
               type="text"
+              name="name"
               placeholder="e.g. Instant Chicken Noodles"
               className="w-full rounded-lg border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-primary"
             />
@@ -88,6 +120,7 @@ export default function AddProduct() {
             </label>
 
             <select
+              name="category"
               defaultValue=""
               className="w-full rounded-lg border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-primary"
             >
@@ -96,8 +129,8 @@ export default function AddProduct() {
               </option>
 
               {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
+                <option key={category.value} value={category.value}>
+                  {category.label}
                 </option>
               ))}
             </select>
@@ -110,6 +143,7 @@ export default function AddProduct() {
             </label>
 
             <input
+              name="unit"
               type="text"
               placeholder="e.g. 1 kg, 500 g, 1 L"
               className="w-full rounded-lg border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-primary"
@@ -123,9 +157,9 @@ export default function AddProduct() {
             </label>
 
             <input
-              type="number"
-              min="0"
-              step="1"
+              type="text"
+              name="stock"
+             
               placeholder="e.g. 50"
               className="w-full rounded-lg border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-primary"
             />
@@ -143,13 +177,12 @@ export default function AddProduct() {
 
             <div className="flex overflow-hidden rounded-lg border border-border focus-within:border-primary">
               <span className="flex items-center bg-background px-4 text-sm text-muted">
-                $
+              ₹
               </span>
 
               <input
-                type="number"
-                min="0"
-                step="0.01"
+                name="price"
+                type="text"
                 placeholder="0.00"
                 className="w-full bg-white px-3 py-3 text-sm outline-none"
               />
@@ -164,13 +197,12 @@ export default function AddProduct() {
 
             <div className="flex overflow-hidden rounded-lg border border-border focus-within:border-primary">
               <span className="flex items-center bg-background px-4 text-sm text-muted">
-                $
+              ₹
               </span>
 
               <input
-                type="number"
-                min="0"
-                step="0.01"
+                name="oldPrice"
+                type="text"
                 placeholder="0.00"
                 className="w-full bg-white px-3 py-3 text-sm outline-none"
               />
@@ -184,6 +216,7 @@ export default function AddProduct() {
             </label>
 
             <textarea
+              name="description"
               rows={5}
               placeholder="Enter a short description about the product..."
               className="w-full resize-none rounded-lg border border-border bg-white px-4 py-3 text-sm outline-none transition focus:border-primary"
@@ -213,11 +246,11 @@ export default function AddProduct() {
             <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
               {images.map((image, index) => (
                 <div
-                  key={image}
+                  key={index}
                   className="group relative aspect-square overflow-hidden rounded-xl border border-border bg-background"
                 >
                   <Image
-                    src={image}
+                    src={URL.createObjectURL(image)}
                     alt={`Product image ${index + 1}`}
                     fill
                     className="object-contain p-2"
@@ -286,7 +319,7 @@ export default function AddProduct() {
             type="submit"
             className="rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white transition hover:bg-primary-hover"
           >
-            Add Product
+          {loading ? "Adding..." : "Add Product"}
           </button>
         </div>
       </form>

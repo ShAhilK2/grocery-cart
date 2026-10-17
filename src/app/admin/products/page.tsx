@@ -139,7 +139,7 @@ export default function ProductsPage() {
                   </td>
 
                   <td className="px-5 py-4 font-medium text-text">
-                    ${product.price.toFixed(2)}
+                  ₹{product.price.toFixed(2)}
                   </td>
 
                   <td className="px-5 py-4">
@@ -199,7 +199,7 @@ export default function ProductsPage() {
 
                   <div className="mt-1 flex items-center gap-3 text-sm">
                     <span className="font-medium text-primary">
-                      ${product.price.toFixed(2)}
+                    ₹{product.price.toFixed(2)}
                     </span>
 
                     <span

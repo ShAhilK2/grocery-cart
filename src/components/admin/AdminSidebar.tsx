@@ -79,7 +79,7 @@ export default function AdminSidebar() {
           fixed left-0 bg-white top-0 z-50 h-screen w-64 border-r border-border
           bg-card transition-transform duration-300
           lg:sticky lg:translate-x-0
-          ${open ? "translate-x-0" : "-translate-x-full"}
+        ₹{open ? "translate-x-0" : "-translate-x-full"}
         `}
       >
         {/* Logo */}
@@ -117,7 +117,7 @@ export default function AdminSidebar() {
                 className={`
                   flex items-center gap-3 rounded-lg px-3 py-6 text-sm
                   font-medium transition
-                  ${
+                ₹{
                     isActive
                       ? "bg-primary text-white"
                       : "text-muted hover:bg-background hover:text-primary"
