@@ -4,20 +4,52 @@ import { FormEvent, useState } from "react";
 import { FiLock, FiMail } from "react-icons/fi";
 import { useAuthModal } from "@/store/authModalStore";
 import Modal from "./Modal";
+import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function LoginModal() {
   const { isLoginOpen, closeLogin, openRegister } = useAuthModal();
+  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const handleSubmit = async(e:React.SubmitEvent) => {
     e.preventDefault();
+         if(!emailRegex.test(email) || !password.trim()) {
+    return toast.error("Please fill in all fields");
+  }
 
-    console.log({
-      email,
-      password,
-    });
+
+    try {
+      setLoading(true);
+    const {error} = await authClient.signIn.email({
+    email : email.trim(),
+    password : password,
+  });
+  
+    if(error) {
+      toast.error(error.message || "Login failed");
+      return;
+    }
+    
+    toast.success("Login successful!");
+    setEmail("");
+    setPassword("");
+    closeLogin();
+    router.refresh();
+    
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+
+    }
+    finally {
+      setLoading(false);
+    }
   };
 
   const handleRegister = () => {
@@ -112,7 +144,7 @@ export default function LoginModal() {
             type="submit"
             className="w-full cursor-pointer rounded-lg bg-primary py-3 font-medium text-white transition hover:bg-primary-hover"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

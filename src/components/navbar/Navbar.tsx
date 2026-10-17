@@ -11,12 +11,15 @@ import CartSidebar from "./CartSidebar";
 import { useAuthModal } from "@/store/authModalStore";
 import { LuSparkles } from "react-icons/lu";
 import GroceryAssistant from "./GroceryAssistant";
+import { authClient } from "@/lib/auth-client";
+import { ModeToggle } from "../toggle-theme";
 
 
 export default function Navbar() {
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const { data: session } = authClient.useSession();
    const { openLogin } = useAuthModal();
 
   return (
@@ -30,7 +33,7 @@ export default function Navbar() {
   <LuSparkles size={18} />
   <span>Ask AI</span>
 </button>
-      <nav className="relative z-40 flex items-center justify-between border-b border-border bg-white px-6 py-4 transition-all md:px-16 lg:px-24 xl:px-32">
+      <nav className="relative z-40 flex items-center justify-between border-b border-border bg-background px-6 py-4 transition-all md:px-16 lg:px-24 xl:px-32">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white">
@@ -94,15 +97,22 @@ export default function Navbar() {
             <span className="absolute -right-3 -top-2 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-primary text-[10px] text-white">
               3
             </span>
+
+        
           </button>
 
           {/* Login + Avatar */}
           <div className="flex items-center gap-2">
-            <button onClick={openLogin} className="cursor-pointer rounded-full bg-primary px-6 py-2 text-sm text-white transition hover:bg-primary-hover">
-              Login
-            </button>
-
-            <Avatar />
+            {session ? (
+              <>
+                <ModeToggle />
+                <Avatar />
+              </>
+            ) : (
+              <button onClick={openLogin} className="cursor-pointer rounded-full bg-primary px-6 py-2 text-sm text-white transition hover:bg-primary-hover">
+                Login
+              </button>
+            )}
             
           </div>
         </div>
@@ -183,14 +193,19 @@ export default function Navbar() {
             <span>Cart</span>
           </button>
 
-          {/* Login + Avatar */}
-          <div className="flex items-center gap-3">
-            <button onClick={openLogin} className="cursor-pointer rounded-full bg-primary px-6 py-2 text-sm text-white transition hover:bg-primary-hover">
-              Login
-            </button>
+          <ModeToggle />
 
-            <Avatar mobile />
-          </div>
+          {/* Login + Avatar */}
+        <div className="flex items-center gap-2">
+  <ModeToggle />
+  {session ? (
+    <Avatar />
+  ) : (
+    <button onClick={openLogin} className="cursor-pointer rounded-full bg-primary px-6 py-2 text-sm text-white transition hover:bg-primary-hover">
+      Login
+    </button>
+  )}
+</div>
         </div>
         
       </nav>

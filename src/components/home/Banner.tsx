@@ -27,7 +27,7 @@ export default function Banner() {
        
           
 
-          <h1 className="max-w-70  font-bold leading-tight text-text sm:max-w-md text-3xl md:max-w-lg md:text-5xl lg:text-6xl text-center md:text-left">
+          <h1 className="max-w-70  !text-primary/50 font-bold leading-tight text-text sm:max-w-md text-3xl md:max-w-lg md:text-5xl lg:text-6xl text-center md:text-left">
             Fresh Groceries.
             <br />
             

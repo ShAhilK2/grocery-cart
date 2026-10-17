@@ -4,25 +4,62 @@ import { useState } from "react";
 import { FiLock, FiMail, FiUser } from "react-icons/fi";
 import { useAuthModal } from "@/store/authModalStore";
 import Modal from "./Modal";
+import toast from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 export default function RegisterModal() {
   const { isRegisterOpen, closeRegister, openLogin } = useAuthModal();
 
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter()
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  
 
-  const handleSubmit = (e:React.SubmitEvent) => {
+
+
+  const handleSubmit = async(e:React.SubmitEvent) => {
     e.preventDefault();
+         if(!name.trim() || !emailRegex.test(email) || !password.trim()) {
+    return toast.error("Please fill in all fields");
+  }
 
+  if(password.length < 6) {
+    return toast.error("Password must be at least 6 characters");
+  }
+    try {
+      setLoading(true);
+    const {error} = await authClient.signUp.email({
+    name : name.trim(),
+    email : email.trim(),
+    password : password,
+  });
+  
+    if(error) {
+      toast.error(error.message || "Registration failed");
+      return;
+    }
     
+    toast.success("Registration successful!");
+    setName("");
+    setEmail("");
+    setPassword("");
+    closeRegister();
+    router.refresh();
+    
+    } catch (error) {
+      toast.error("An unexpected error occurred");
 
-    console.log({
-      name,
-      email,
-      password,
-    });
+    }
+    finally {
+      setLoading(false);
+    }
   };
 
   const handleLogin = () => {
@@ -70,7 +107,7 @@ export default function RegisterModal() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="Enter your full name"
-                required
+  
                 className="w-full rounded-lg border border-border bg-white py-3 pl-10 pr-4 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -97,7 +134,7 @@ export default function RegisterModal() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                required
+                
                 className="w-full rounded-lg border border-border bg-white py-3 pl-10 pr-4 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -124,8 +161,7 @@ export default function RegisterModal() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Create a password"
-                required
-                minLength={6}
+        
                 className="w-full rounded-lg border border-border bg-white py-3 pl-10 pr-4 text-sm text-text outline-none transition placeholder:text-muted focus:border-primary focus:ring-2 focus:ring-primary/20"
               />
             </div>
@@ -138,7 +174,7 @@ export default function RegisterModal() {
             type="submit"
             className="w-full cursor-pointer rounded-lg bg-primary py-3 font-medium text-white transition hover:bg-primary-hover"
           >
-            Create Account
+            {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
 

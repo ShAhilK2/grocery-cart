@@ -1,9 +1,12 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { FiLogOut, FiPackage } from "react-icons/fi";
+import { ModeToggle } from "../toggle-theme";
 
 interface AvatarProps {
   mobile?: boolean;
@@ -12,9 +15,24 @@ interface AvatarProps {
 export default function Avatar({ mobile = false }: AvatarProps) {
   const [open, setOpen] = useState(false);
 
+  const handleLogOut = async () => {
+    // TODO: Implement logout
+
+    const { error } = await authClient.signOut();
+    if (error) {
+      toast.error(error.message || "Logout failed");
+      return;
+    }
+
+    toast.success("Logout successful");
+    
+    // TODO: Redirect to login page or refresh
+  };
+
   return (
     <div className="relative">
       {/* Avatar */}
+   
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
@@ -27,6 +45,8 @@ export default function Avatar({ mobile = false }: AvatarProps) {
           className="object-cover"
         />
       </button>
+
+     
 
       {/* Dropdown */}
       {open && (
@@ -49,6 +69,7 @@ export default function Avatar({ mobile = false }: AvatarProps) {
           {/* Logout */}
           <button
             type="button"
+            onClick={handleLogOut}
             className="flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-text transition hover:bg-background hover:text-primary"
           >
             <FiLogOut size={18} />
@@ -56,6 +77,7 @@ export default function Avatar({ mobile = false }: AvatarProps) {
           </button>
         </div>
       )}
+      
     </div>
   );
 }
