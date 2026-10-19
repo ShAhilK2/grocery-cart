@@ -3,12 +3,12 @@ import Link from "next/link";
 import { IoCartOutline } from "react-icons/io5";
 
 interface ProductCardType {
-  id: number;
+  id: string;
   name: string;
   category: string;
-  price: number;
-  oldPrice: number;
-  image: string;  
+  price: string;
+  oldPrice: string | null;
+  image: string | null;  
   unit: number | string;
   slug:string
 }
@@ -26,7 +26,7 @@ export default function ProductCard({product}:ProductCardProps) {
       <Link href={`/products/${product.slug}`} className="group flex items-center justify-center px-2">
         <Image
           className="group-hover:scale-105 transition w-40 h-40 object-contain"
-          src={product.image}
+          src={product.image || ""}
           alt={product.name}
           width={400}
           height={400}

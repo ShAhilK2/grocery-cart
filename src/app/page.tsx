@@ -5,7 +5,10 @@ import CategorySection from "@/components/home/CategorySection";
 import NewArrivals from "@/components/home/NewArrivals";
 import FrontendLayout from "@/components/layouts/FrontendLayout";
 
+
+export const dynamic = 'force-dynamic';
 export default function Home() {
+  
   return (
     <FrontendLayout>
       <div className="mt-8">

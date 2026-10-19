@@ -9,7 +9,7 @@ interface DeleteProductButtonProps {
     productId: string;
 }
 
-export  function DeleteProductButton({ productId }: DeleteProductButtonProps) {
+export function DeleteProductButton({ productId }: DeleteProductButtonProps) {
     const router = useRouter()
     const [isDeleting, setIsDeleting] = useState(false)
 
