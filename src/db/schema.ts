@@ -25,7 +25,7 @@ export const product = pgTable("product",{
 // product images 
 export const productImage = pgTable("product_images",{
   id : text("id").primaryKey(),
-  productId : text("product_id").notNull().references(() => product.id),
+  productId : text("product_id").notNull().references(() => product.id, { onDelete: "cascade" }),
   imageUrl : text("image_url").notNull(),
   publicId : text("public_id").notNull(),
   isMain : boolean("is_main").default(false).notNull(),

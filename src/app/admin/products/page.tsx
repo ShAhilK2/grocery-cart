@@ -1,3 +1,4 @@
+import { DeleteProductButton } from "@/components/product/deleteProductButton";
 import { getProducts } from "@/server-actions/products/getProducts";
 import Image from "next/image";
 import Link from "next/link";
@@ -121,14 +122,7 @@ export default async function ProductsPage() {
 
                   <td className="px-5 py-4">
                     <div className="flex justify-end gap-2">
-                   
-
-                      <button
-                        type="button"
-                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted transition hover:border-error hover:text-error"
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
+                      <DeleteProductButton productId={product.id} />
                     </div>
                   </td>
                 </tr>
@@ -181,15 +175,7 @@ export default async function ProductsPage() {
               </div>
 
               <div className="mt-3">
-               
-
-                <button
-                  type="button"
-                  className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-border py-2 px-3 text-sm text-muted transition hover:border-error hover:text-error"
-                >
-                  <FiTrash2 size={15} />
-                  Delete
-                </button>
+                <DeleteProductButton productId={product.id} />
               </div>
             </div>
           ))}
