@@ -1,107 +1,44 @@
 import FrontendLayout from "@/components/layouts/FrontendLayout";
+import ProductCardSkeleton from "@/components/loading/skeleton/ProductCardSkeleton";
 import FilterOptions from "@/components/product/FilterOptions";
 import ProductCard from "@/components/product/ProductCard";
+import ShopProduct from "@/components/product/shopProduct";
 import SortOptions from "@/components/product/sortOptions";
+import { Suspense } from "react";
 
-export const products = [
-  {
-    id: 1,
-    name: "Fresh Red Apples",
-    slug: "fresh-red-apples",
-    category: "Fresh Fruits",
-    image: "/images/product-2.png",
-    price: 4.99,
-    oldPrice: 5.99,
-    unit: "1 kg",
-    rating: 4.8,
-  },
-  {
-    id: 2,
-    name: "Fresh Tomatoes",
-    slug: "fresh-tomatoes",
-    category: "Vegetables",
-    image: "/images/product-17.png",
-    price: 3.49,
-    oldPrice: 4.29,
-    unit: "1 kg",
-    rating: 4.7,
-  },
-  {
-    id: 3,
-    name: "Whole Wheat Bread",
-    slug: "whole-wheat-bread",
-    category: "Baked Foods",
-    image: "/images/product-14.png",
-    price: 2.99,
-    oldPrice: 3.49,
-    unit: "500 g",
-    rating: 4.6,
-  },
-  {
-    id: 4,
-    name: "Crunchy Corn Flakes",
-    slug: "crunchy-corn-flakes",
-    category: "Cereals",
-    image: "/images/product-19.png",
-    price: 6.49,
-    oldPrice: 7.49,
-    unit: "500 g",
-    rating: 4.9,
-  },
-  {
-    id: 5,
-    name: "Orange Juice",
-    slug: "orange-juice",
-    category: "Drinks",
-    image: "/images/product-16.png",
-    price: 4.49,
-    oldPrice: 5.29,
-    unit: "1 L",
-    rating: 4.7,
-  },
-  {
-    id: 6,
-    name: "Instant Chicken Noodles",
-    slug: "instant-chicken-noodles",
-    category: "Instant Foods",
-    image: "/images/product-21.png",
-    price: 2.49,
-    oldPrice: 2.99,
-    unit: "5 Pack",
-    rating: 4.6,
-  },
-  {
-    id: 7,
-    name: "Cheddar Cheese",
-    slug: "cheddar-cheese",
-    category: "Dairy Products",
-    image: "/images/product-15.png",
-    price: 7.99,
-    oldPrice: 8.99,
-    unit: "250 g",
-    rating: 4.9,
-  },
-];
 
-export default function ProductsPage() {
+interface ProductsPageProps {
+  searchParams: Promise<{ 
+    categories?: string | string[],
+    priceRanges?: string | string[],
+    sort ?: "newest" | "oldest" | "price-low" | "price-high"
+  }>;
+} 
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+
+  const params = await searchParams;
+  // Array is Array => return array, else return array with single string
+  const categories = params.categories ? Array.isArray(params.categories) ? params.categories : [params.categories] : [];
+  const priceRanges = params.priceRanges ? Array.isArray(params.priceRanges) ? params.priceRanges : [params.priceRanges] : [];
+  const sort = params.sort === "oldest" || params.sort === "price-low" || params.sort === "price-high" ? params.sort : "newest";
   return (
     <FrontendLayout>
-        <div className="my-6">
-           <div className="flex flex-col sm:flex-row gap-5  my-10 ">
-            <FilterOptions/>
- <div className="flex-1">
- <SortOptions/>
+      <div className="my-6">
+        <div className="flex flex-col sm:flex-row gap-5  my-10 ">
+          <FilterOptions />
+          <div className="flex-1">
+            <SortOptions />
 
-           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4   mt-6 gap-6">
-                      {products.map((product) => (
-                          <ProductCard key={product.id} product={product}/>
-                      ))}
-                   </div>
- </div>
-           </div>
-         
+       <Suspense fallback={<ProductCardSkeleton number={4} />}>
+        <ShopProduct 
+        categories={categories}
+        priceRanges={priceRanges}
+        sort={sort}
+        />
+       </Suspense>
+          </div>
         </div>
-        
+      </div>
     </FrontendLayout>
-  )
+  );
 }

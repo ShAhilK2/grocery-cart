@@ -3,13 +3,14 @@
 import { Suspense } from "react";
 import ProductCard from "../product/ProductCard";
 import { getNewArrivalProducts } from "@/server-actions/products/getNewArrivialproduct";
+import ProductCardSkeleton from "../loading/skeleton/ProductCardSkeleton";
 
 
 export default function NewArrivals() {
   return (
     <div className="mt-16">
       <h2 className="text-2xl md:text-3xl font-medium">New Arrivals</h2>
-      <Suspense fallback={<p>Loading...</p>}>
+      <Suspense fallback={<ProductCardSkeleton number={4} />}>
         <NewArrivalProducts />
       </Suspense>
     </div>

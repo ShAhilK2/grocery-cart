@@ -1,10 +1,55 @@
 "use client";
 
+import { categories } from "@/constants/categories";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { RiArrowRightDoubleFill } from "react-icons/ri";
 
+const priceRanges = [
+  {label : "₹0-₹100", value : "0-100"},
+  {label : "₹100-₹200", value : "100-200"},
+  {label : "₹200-₹500", value : "200-500"},
+  {label : "₹500+", value : "500+"},
+] as const
+
 export default function FilterOptions() {
   const [showFilter, setShowFilter] = useState(false);
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  console.log(pathname)
+  console.log(searchParams)
+
+  const handleFilterChange = (type : "categories" | "priceRanges", value : string)=>{
+    // TODO: Implement filter logic
+   
+    // url search params => update => redirect
+    // eg ?categories=fruits&priceRanges=0-10
+    // 
+    const params = new URLSearchParams(searchParams.toString())
+    // update the params
+    const currentValues = params.getAll(type)
+     
+    params.delete(type)
+
+    if(!currentValues.includes(value)) {
+      currentValues.push(value)
+    }else{
+      const index = currentValues.indexOf(value)
+      currentValues.splice(index, 1)
+    }
+
+    currentValues.forEach((value) => {
+      params.append(type, value)
+    })
+
+    router.push(`${pathname}?${params.toString()}`)
+  }
+  const isChecked = (type : "categories" | "priceRanges", value : string) => {
+    const currentValues = searchParams.getAll(type)
+    return currentValues.includes(value)
+  }
 
   return (
     <aside className="w-full sm:min-w-60 sm:max-w-60">
@@ -35,68 +80,18 @@ export default function FilterOptions() {
           </h3>
 
           <div className="space-y-3 text-sm text-muted">
-            <label className="flex cursor-pointer items-center gap-3">
+       {categories.map((category) => (
+         <label key={category.value} className="flex cursor-pointer items-center gap-3">
               <input
+              onChange={() => handleFilterChange("categories", category.value)}
+              checked={isChecked("categories", category.value)}
                 type="checkbox"
-                value="Fresh Fruits"
+                value={category.value}
                 className="accent-primary"
               />
-              <span>Fresh Fruits</span>
+              <span>{category.label}</span>
             </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="Vegetables"
-                className="accent-primary"
-              />
-              <span>Vegetables</span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="Baked Foods"
-                className="accent-primary"
-              />
-              <span>Baked Foods</span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="Cereals"
-                className="accent-primary"
-              />
-              <span>Cereals</span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="Dairy Products"
-                className="accent-primary"
-              />
-              <span>Dairy Products</span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="Drinks"
-                className="accent-primary"
-              />
-              <span>Drinks</span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="Instant Foods"
-                className="accent-primary"
-              />
-              <span>Instant Foods</span>
-            </label>
+          ))}
           </div>
         </div>
 
@@ -108,41 +103,18 @@ export default function FilterOptions() {
           </h3>
 
           <div className="space-y-3 text-sm text-muted">
-            <label className="flex cursor-pointer items-center gap-3">
+         {priceRanges.map((priceRange) => (
+            <label key={priceRange.value} className="flex cursor-pointer items-center gap-3">
               <input
+                onChange={() => handleFilterChange("priceRanges", priceRange.value)}
+                checked={isChecked("priceRanges", priceRange.value)}
                 type="checkbox"
-                value="0-10"
+                value={priceRange.value}
                 className="accent-primary"
               />
-              <span>$0 - $10</span>
+              <span>{priceRange.label}</span>
             </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="10-25"
-                className="accent-primary"
-              />
-              <span>$10 - $25</span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="25-50"
-                className="accent-primary"
-              />
-              <span>$25 - $50</span>
-            </label>
-
-            <label className="flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                value="50+"
-                className="accent-primary"
-              />
-              <span>$50+</span>
-            </label>
+          ))}
           </div>
         </div>
 
