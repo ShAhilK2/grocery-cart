@@ -1,28 +1,71 @@
 "use client";
 
+import { getProductBySlug } from "@/server-actions/products/getProductBySlug";
+import { useCartStore } from "@/store/cart-store";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
-export default function ProductPageComponent() {
-  const product = {
-    name: "Instant Chicken Noodles",
-    category: "Instant Foods",
-    price: 189,
-    offerPrice: 159,
-    images: [
-      "/images/gallery-1.png",
-      "/images/gallery-2.png",
-      "/images/gallery-3.png",
-    ],
-    description: [
-      "Fresh and carefully selected for the best quality",
-      "Rich in natural flavor and perfect for everyday meals",
-      "Packed carefully to preserve freshness",
-    ],
-  };
 
-  const [thumbnail, setThumbnail] = useState(product.images[0]);
+type productType = NonNullable<Awaited<ReturnType<typeof getProductBySlug>>["product"]>
 
+
+interface ProductPageComponentProps {
+  product : productType
+}
+export default function ProductPageComponent({product}: ProductPageComponentProps) {
+
+  const router = useRouter()
+
+ 
+  const {addCartItem} = useCartStore()
+
+
+   const handleCartItem = ()=>{
+
+    if(product.stock <=0){
+      toast.error("Product is out of stock")
+      return
+    }
+
+      addCartItem({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        unit: product.unit,
+        image: mainImage
+       })
+
+
+       toast.success(`${product.name} added to cart`)
+    }
+
+   const handleBuyNow = ()=>{
+
+    if(product.stock <=0){
+      toast.error("Product is out of stock")
+      return
+    }
+
+      addCartItem({
+        id: product.id,
+        name: product.name,
+        slug: product.slug,
+        price: product.price,
+        unit: product.unit,
+        image: mainImage
+       })
+
+
+     
+       router.push("/checkout")
+    }
+
+
+  const mainImage = product.images.find((image)=>image.isMain)?.imageUrl || product?.images[0]?.imageUrl || ""
+  const [thumbnail, setThumbnail] = useState(mainImage);
   return (
     <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 md:px-8 md:py-10">
       {/* Breadcrumb */}
@@ -45,15 +88,15 @@ export default function ProductPageComponent() {
                 <button
                   type="button"
                   key={index}
-                  onClick={() => setThumbnail(image)}
+                  onClick={() => setThumbnail(image.imageUrl)}
                   className={`h-20 w-20 shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-white transition sm:h-20 sm:w-20 ${
-                    thumbnail === image
+                    thumbnail === image.imageUrl
                       ? "border-primary"
                       : "border-border hover:border-primary"
                   }`}
                 >
                   <Image
-                    src={image}
+                    src={image.imageUrl}
                     alt={`Thumbnail ${index + 1}`}
                     width={100}
                     height={100}
@@ -89,25 +132,23 @@ export default function ProductPageComponent() {
           {/* Price */}
           <div className="mt-5">
             <p className="text-sm text-muted line-through sm:text-base">
-            ₹{product.price}
+            ₹{product.oldPrice}
             </p>
 
             <p className="mt-1 text-2xl font-medium text-primary sm:text-3xl">
-            ₹{product.offerPrice}
+            ₹{product.price}
             </p>
           </div>
 
-          {/* About Product */}
+          {/* About Product */} 
           <div className="mt-6">
             <p className="text-base font-medium text-text">
               About Product
             </p>
 
-            <ul className="mt-3 ml-4 list-disc space-y-2 text-sm leading-6 text-muted">
-              {product.description.map((desc, index) => (
-                <li key={index}>{desc}</li>
-              ))}
-            </ul>
+           <p className="mt-3 text-sm leading-6 text-muted">
+            {product.description}
+           </p>
           </div>
 
           {/* Actions */}
@@ -115,15 +156,19 @@ export default function ProductPageComponent() {
             <button
               type="button"
               className="w-full cursor-pointer rounded-lg bg-gray-100 py-3.5 font-medium text-text transition hover:bg-border"
+              onClick={handleCartItem}
+              disabled={product.stock <= 0}
             >
-              Add to Cart
+      {product.stock <= 0 ? "Out of Stock" : "Add to Cart"}
             </button>
 
             <button
               type="button"
+                       disabled={product.stock <= 0}
               className="w-full cursor-pointer rounded-lg bg-primary py-3.5 font-medium text-white transition hover:bg-primary-hover"
+              onClick={handleBuyNow}
             >
-              Buy Now
+              {product.stock <= 0 ? "Out of Stock" : "Buy Now"}
             </button>
           </div>
         </div>

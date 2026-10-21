@@ -32,7 +32,7 @@ export default function ProductCard({product}:ProductCardProps) {
       slug: product.slug,
       price: product.price,
       unit: product.unit,
-      image: product.image,
+      image: product.image
      })
 
      toast.success(`${product.name} added to cart`)
