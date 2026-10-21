@@ -4,7 +4,7 @@ import Link from "next/link";
 const categories = [
   {
     text: "Fresh Fruits",
-    slug: "fruits",
+    slug: "fresh-fruits",
     image: "/images/fruits.png",
     background: "#FEF6DA",
   },
@@ -54,7 +54,7 @@ export default function CategorySection() {
         {categories.map((category) => (
           <Link
             style={{ backgroundColor: category.background }}
-            href={`/products${category.slug}`}
+            href={`/products?categories=${category.slug}`}
             key={category.slug}
             className="group py-5 px-3  gap-2 rounded-lg flex flex-col justify-center items-center"
           >

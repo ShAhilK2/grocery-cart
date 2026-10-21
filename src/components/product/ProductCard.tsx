@@ -1,5 +1,8 @@
+"use client"
+import { useCartStore } from "@/store/cart-store";
 import Image from "next/image";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { IoCartOutline } from "react-icons/io5";
 
 interface ProductCardType {
@@ -18,6 +21,24 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({product}:ProductCardProps) {
+
+  const {addCartItem} = useCartStore()
+
+
+  const handleCartItem = ()=>{
+    addCartItem({
+      id: product.id,
+      name: product.name,
+      slug: product.slug,
+      price: product.price,
+      unit: product.unit,
+      image: product.image,
+     })
+
+     toast.success(`${product.name} added to cart`)
+  }
+
+
 
 
   
@@ -49,7 +70,7 @@ export default function ProductCard({product}:ProductCardProps) {
           
               <button
                 className="flex items-center justify-center gap-1 bg-[#E8F7EF] border border-primary-hover md:w-[80px] w-[64px] h-[34px] rounded text-primary font-medium"
-               
+               onClick={handleCartItem}
               >
                   <IoCartOutline size={16}  className="text-primary"/>
                 Add

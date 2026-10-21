@@ -15,12 +15,15 @@ import { authClient } from "@/lib/auth-client";
 import { ModeToggle } from "../toggle-theme";
 import SearchInput from "./SearchInput";
 import MobileSearchInput from "./MobileSearchInput";
+import { useCartStore } from "@/store/cart-store";
 
 
 export default function Navbar() {
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [open, setOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+
+   const cartCount = useCartStore((state) => state.cartItems.reduce((total, item) => total + item.quantity, 0))
   const { data: session } = authClient.useSession();
    const { openLogin } = useAuthModal();
 
@@ -86,7 +89,7 @@ export default function Navbar() {
             />
 
             <span className="absolute -right-3 -top-2 flex h-4.5 w-4.5 items-center justify-center rounded-full bg-primary text-[10px] text-white">
-              3
+              {cartCount}
             </span>
 
         
@@ -166,7 +169,7 @@ export default function Navbar() {
               <IoCartOutline size={22} />
 
               <span className="absolute -right-2 -top-2 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[9px] text-white">
-                3
+                {cartCount}
               </span>
             </div>
 
