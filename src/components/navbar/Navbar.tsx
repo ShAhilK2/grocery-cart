@@ -13,6 +13,8 @@ import { LuSparkles } from "react-icons/lu";
 import GroceryAssistant from "./GroceryAssistant";
 import { authClient } from "@/lib/auth-client";
 import { ModeToggle } from "../toggle-theme";
+import SearchInput from "./SearchInput";
+import MobileSearchInput from "./MobileSearchInput";
 
 
 export default function Navbar() {
@@ -69,18 +71,7 @@ export default function Navbar() {
           </Link>
 
           {/* Search */}
-          <div className="hidden items-center gap-2 rounded-full border border-border px-3 lg:flex">
-            <input
-              type="text"
-              placeholder="Search products"
-              className="w-full bg-transparent py-1.5 text-sm outline-none placeholder:text-muted"
-            />
-
-            <FaSearch
-              className="text-muted"
-              size={14}
-            />
-          </div>
+        <SearchInput />
 
           {/* Cart */}
           <button
@@ -160,18 +151,7 @@ export default function Navbar() {
           </Link>
 
           {/* Mobile Search */}
-          <div className="flex w-full items-center gap-2 rounded-full border border-border px-3">
-            <input
-              type="text"
-              placeholder="Search products"
-              className="w-full bg-transparent py-2 text-sm outline-none placeholder:text-muted"
-            />
-
-            <FaSearch
-              className="text-muted"
-              size={14}
-            />
-          </div>
+      <MobileSearchInput />
 
           {/* Mobile Cart */}
           <button

@@ -1,7 +1,8 @@
 import FrontendLayout from "@/components/layouts/FrontendLayout";
 
 import ProductCard from "@/components/product/ProductCard";
-import { products } from "../products/page";
+import { getSearchProduct } from "@/server-actions/products/getSearchProduct";
+ 
 import Link from "next/link";
 
 interface SearchPageProps {
@@ -16,11 +17,9 @@ export default async function SearchPage({
   const params = await searchParams;
   const query = params.q?.trim() || "";
 
-  const searchResults = products.filter((product) =>
-    `${product.name} ${product.category}`
-      .toLowerCase()
-      .includes(query.toLowerCase())
-  );
+  const { products :searchResults} = await getSearchProduct(query);
+
+
 
   return (
     <FrontendLayout>
