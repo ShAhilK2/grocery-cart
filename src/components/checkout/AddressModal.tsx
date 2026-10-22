@@ -1,6 +1,9 @@
 "use client";
 
+import { addAddress } from "@/server-actions/user/addAddress";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { IoClose } from "react-icons/io5";
 
 interface AddAddressModalProps {
@@ -12,11 +15,18 @@ export default function AddAddressModal({
   isOpen,
   onClose,
 }: AddAddressModalProps) {
+
+  const router = useRouter();
+  const [isSubmitting,setIsSubmitting] = useState(false);
+
+   
+
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     phone: "",
-    address: "",
+    street: "",
     city: "",
     state: "",
     postalCode: "",
@@ -32,12 +42,43 @@ export default function AddAddressModal({
     }));
   };
 
-  const handleSubmit = (e: React.SubmitEvent) => {
+  const handleSubmit = async(e: React.SubmitEvent) => {
     e.preventDefault();
 
-    console.log(formData);
+    setIsSubmitting(true);
+   
+    const result = await addAddress({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      phone: formData.phone,
+      street: formData.street,
+      city: formData.city,
+      state: formData.state,
+      postalCode: formData.postalCode,
+      country: formData.country,
+    })
 
+    if(!result.success) {
+      toast.error(result.error || "Failed to add address");
+      setIsSubmitting(false);
+      return;
+    }
+
+    setFormData({
+      firstName: "",
+      lastName: "",
+      phone: "",
+      street: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "",
+    })
+
+    setIsSubmitting(false);
+    toast.success("Address added successfully");
     onClose();
+    router.refresh();
   };
 
   if (!isOpen) return null;
@@ -146,10 +187,10 @@ export default function AddAddressModal({
             </label>
 
             <input
-              id="address"
-              name="address"
+              id="street"
+              name="street"
               type="text"
-              value={formData.address}
+              value={formData.street}
               onChange={handleChange}
               placeholder="123 Main Street"
               required
@@ -247,6 +288,7 @@ export default function AddAddressModal({
           <div className="flex flex-col-reverse gap-3 pt-2 sm:flex-row sm:justify-end">
             <button
               type="button"
+              disabled={isSubmitting}
               onClick={onClose}
               className="w-full cursor-pointer rounded-lg border border-border px-5 py-3 text-sm font-medium text-text transition hover:bg-background sm:w-auto"
             >
@@ -257,7 +299,7 @@ export default function AddAddressModal({
               type="submit"
               className="w-full cursor-pointer rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white transition hover:bg-primary-hover sm:w-auto"
             >
-              Save Address
+              {isSubmitting ? "Saving..." : "Save Address"}
             </button>
           </div>
         </form>

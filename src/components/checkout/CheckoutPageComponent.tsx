@@ -2,13 +2,31 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { FiArrowLeft, FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
-import AddAddressModal from "./AddressModal";
 
-export default function CheckoutPageComponent() {
-  const [showAddress, setShowAddress] = useState(false);
-  const [showAddressModal, setShowAddressModal] = useState(false);
+import { FiArrowLeft, FiMinus, FiPlus, FiTrash2 } from "react-icons/fi"; 
+import DeliveryAddress from "./DeliveryAddress";
+import { useState } from "react";
+
+export type addressProps ={
+  id : string;
+  firstName : string;
+  lastName : string;
+  userId : string;
+  street : string;
+  city : string;
+  state : string;
+  postalCode : string;
+  country : string;
+  isDefault : boolean;
+}
+
+interface CheckoutPageComponent {
+  addresses : addressProps[];
+}
+export default function CheckoutPageComponent({addresses} :CheckoutPageComponent) {
+
+  const [selectedAddress,setSelectedAddress] = useState<addressProps | null>(null)
+
 
   const products = [
     {
@@ -62,10 +80,7 @@ export default function CheckoutPageComponent() {
             {products.length} Items
           </span>
         </h1>
-<AddAddressModal
-  isOpen={showAddressModal}
-  onClose={() => setShowAddressModal(false)}
-/>
+
         {/* Desktop Header */}
         <div className="hidden grid-cols-[2fr_1fr_1fr] border-b border-border pb-3 text-sm font-medium text-muted sm:grid">
           <p>Product Details</p>
@@ -185,45 +200,8 @@ export default function CheckoutPageComponent() {
         <hr className="my-5 border-border" />
 
         {/* Delivery Address */}
-        <div>
-          <p className="text-sm font-medium uppercase text-text">
-            Delivery Address
-          </p>
-
-          <div className="relative mt-2 flex items-start justify-between gap-3">
-            <p className="text-sm text-muted">
-              No address found
-            </p>
-
-            <button
-              type="button"
-              onClick={() => setShowAddress((prev) => !prev)}
-              className="cursor-pointer text-sm font-medium text-primary hover:underline"
-            >
-              Change
-            </button>
-
-            {showAddress && (
-              <div className="absolute right-0 top-8 z-20 w-full overflow-hidden rounded-lg border border-border bg-white shadow-lg">
-                <button
-                  type="button"
-                  onClick={() => setShowAddress(false)}
-                  className="block w-full cursor-pointer p-3 text-left text-sm text-muted transition hover:bg-background"
-                >
-                  123 Main Street, New York
-                </button>
-
-                <button
-                  type="button"
-                   onClick={() => setShowAddressModal(true)}
-                  className="block w-full cursor-pointer border-t border-border p-3 text-center text-sm font-medium text-primary transition hover:bg-primary-light"
-                >
-                  + Add New Address
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+   <DeliveryAddress addresses={addresses} selectedAddress={selectedAddress}
+   setSelectedAddress={setSelectedAddress}/>
 
         {/* Payment Method */}
         <div className="mt-6">
