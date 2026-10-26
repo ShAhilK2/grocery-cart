@@ -83,7 +83,7 @@ export const order = pgTable("order",{
 
 // Orders Item 
 
-export const orderItems = pgTable("order_items",{
+export const orderItem = pgTable("order_items",{
   id : text("id").primaryKey(),
   orderId : text("order_id").notNull().references(() => order.id, { onDelete: "cascade" }),
   productId : text("product_id").notNull().references(() => product.id, { onDelete: "cascade" }),
@@ -104,7 +104,7 @@ export const orderItems = pgTable("order_items",{
 
 export const productRelations = relations(product, ({ many }) => ({
   images: many(productImage),
-  orderItems: many(orderItems),
+  orderItems: many(orderItem),
 }));
 
 // productimage belongs to one product
@@ -140,20 +140,20 @@ export const orderRelations = relations(order, ({ one,many }) => ({
     fields: [order.addressId],
     references: [address.id],
   }),
-  items: many(orderItems),
+  items: many(orderItem),
 }));
  
 
 // order item relations
 // one order has many order items
 // one product has many order items
-export const orderItemRelations = relations(orderItems, ({ one ,many}) => ({
+export const orderItemRelations = relations(orderItem, ({ one ,many}) => ({
   order: one(order, {
-    fields: [orderItems.orderId],
+    fields: [orderItem.orderId],
     references: [order.id],
   }),
   product: one(product, {
-    fields: [orderItems.productId],
+    fields: [orderItem.productId],
     references: [product.id],
   }),
 }));

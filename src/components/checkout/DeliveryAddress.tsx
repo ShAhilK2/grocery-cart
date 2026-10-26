@@ -25,6 +25,15 @@ const DeliveryAddress = ({addresses, selectedAddress, setSelectedAddress} : Deli
 
           <div className="relative mt-2 flex items-start justify-between gap-3">
     
+
+    {selectedAddress ? (
+         <p>
+  {selectedAddress.street} {selectedAddress.city} {" "}
+                  {selectedAddress.state} 
+                  </p>
+    ) : (<p>
+      No address found
+    </p>)}
             <button
               type="button"
               onClick={() => setShowAddress((prev) => !prev)}

@@ -6,6 +6,10 @@ import Link from "next/link";
 import { FiArrowLeft, FiMinus, FiPlus, FiTrash2 } from "react-icons/fi"; 
 import DeliveryAddress from "./DeliveryAddress";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useCartStore } from "@/store/cart-store";
+import toast from "react-hot-toast";
+import { createOrder } from "@/server-actions/checkout/createOrder";
 
 export type addressProps ={
   id : string;
@@ -25,51 +29,73 @@ interface CheckoutPageComponent {
 }
 export default function CheckoutPageComponent({addresses} :CheckoutPageComponent) {
 
-  const [selectedAddress,setSelectedAddress] = useState<addressProps | null>(null)
+  const router = useRouter()
+  const [selectedAddress,setSelectedAddress] = useState<addressProps | null>(
+    null
+  )
+  const [paymentMethod,setPaymentMethod] = useState<"cod" | "stripe">("cod")
+  const [isSubmitting,setIsSubmitting] = useState<boolean>(false)
+
+  const cartItems = useCartStore((store)=>store.cartItems);
+const increaseQuantity = useCartStore((store)=>store.increaseQuantity);
+const decreaseQuantity = useCartStore((store)=>store.decreaseQuantity);
+const removeItem = useCartStore((store)=>store.removeCartItem);
+const clearCart = useCartStore((store)=>store.clearCart);
+
+const cartCount = cartItems.reduce((total,item)=>total + item.quantity,0);
+  const subTotal = cartItems.reduce((total,item)=>total + Number(item.price) * item.quantity,0)
+
+  
+
+  // order above 500 no shipping fee
+  const shippingFee = 0
+  const tax = subTotal * 0.02;
+  const total = subTotal + shippingFee + tax;
 
 
-  const products = [
-    {
-      id: 1,
-      name: "Instant Chicken Noodles",
-      category: "Instant Foods",
-      unit: "5 Pack",
-      offerPrice: 2.49,
-      price: 2.99,
-      quantity: 2,
-      image: "/images/product-21.png",
-    },
-    {
-      id: 2,
-      name: "Fresh Red Apples",
-      category: "Fresh Fruits",
-      unit: "1 kg",
-      offerPrice: 4.99,
-      price: 5.99,
-      quantity: 1,
-      image: "/images/product-2.png",
-    },
-    {
-      id: 3,
-      name: "Cheddar Cheese",
-      category: "Dairy Products",
-      unit: "250 g",
-      offerPrice: 7.99,
-      price: 8.99,
-      quantity: 1,
-      image: "/images/product-15.png",
-    },
-  ];
+  const handlePlaceOrder = async()=>{
+    if(!selectedAddress){
+      toast.error("Please select an address");
+      return;
+    }
 
-  const subtotal = products.reduce(
-    (total, product) => total + product.offerPrice * product.quantity,
-    0
-  );
+    if(cartItems.length === 0){
+      toast.error("Cart is empty");
+      return;
+    }
+     
+    setIsSubmitting(true)
 
-  const shippingFee = subtotal >= 50 ? 0 : 5;
-  const tax = subtotal * 0.02;
-  const total = subtotal + shippingFee + tax;
+    if(paymentMethod === "stripe"){
+      // handle stripe 
+      return
+    }
 
+    const result = await createOrder({
+      addressId: selectedAddress.id,
+      paymentMethod: "cod",
+      items: cartItems.map((item)=>({
+        productId: item.id,
+        quantity: item.quantity,
+      })),
+      shippingFee: shippingFee,
+      tax: tax
+    })
+
+    if(!result.success){
+      toast.error(result.message || "Failed to place order");
+      setIsSubmitting(false);
+      return;
+    }
+
+    clearCart();
+    setIsSubmitting(false);
+    toast.success("Order placed successfully");
+    router.replace("/orders");
+   
+
+
+  }
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-4 py-8 sm:px-6 md:px-8 lg:flex-row lg:py-12">
       {/* Cart */}
@@ -77,7 +103,7 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
         <h1 className="mb-6 text-2xl font-medium text-text md:text-3xl">
           Shopping Cart{" "}
           <span className="text-sm font-normal text-primary">
-            {products.length} Items
+            {cartCount} Items
           </span>
         </h1>
 
@@ -90,7 +116,7 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
 
         {/* Products */}
         <div className="divide-y divide-border">
-          {products.map((product) => (
+          {cartItems.map((product) => (
             <div
               key={product.id}
               className="grid gap-4 py-5 sm:grid-cols-[2fr_1fr_1fr] sm:items-center"
@@ -104,7 +130,7 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
                   className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-background sm:h-28 sm:w-28"
                 >
                   <Image
-                    src={product.image}
+                    src={product.image || ""}
                     alt={product.name}
                     width={120}
                     height={120}
@@ -117,9 +143,9 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
                     {product.name}
                   </p>
 
-                  <p className="mt-1 text-xs text-muted">
+                  {/* <p className="mt-1 text-xs text-muted">
                     {product.category}
-                  </p>
+                  </p> */}
 
                   <p className="mt-1 text-sm text-muted">
                     {product.unit}
@@ -127,18 +153,19 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
 
                   <div className="mt-2 flex items-center gap-2">
                     <span className="font-medium text-primary">
-                    ₹{product.offerPrice.toFixed(2)}
+                    ₹{Number(product.price).toFixed(2)}
                     </span>
 
-                    <span className="text-xs text-muted line-through">
-                    ₹{product.price.toFixed(2)}
-                    </span>
+                    {/* <span className="text-xs text-muted line-through">
+                    ₹{Number(product.oldPrice).toFixed(2)}
+                    </span> */}
                   </div>
 
                   {/* Quantity */}
                   <div className="mt-3 flex w-fit items-center overflow-hidden rounded-md border border-border">
                     <button
                       type="button"
+                      onClick={() => decreaseQuantity(product.id)}
                       className="flex h-7 w-7 cursor-pointer items-center justify-center text-muted hover:bg-background hover:text-primary"
                     >
                       <FiMinus size={13} />
@@ -150,6 +177,7 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
 
                     <button
                       type="button"
+                      onClick={() => increaseQuantity(product.id)}
                       className="flex h-7 w-7 cursor-pointer items-center justify-center text-muted hover:bg-background hover:text-primary"
                     >
                       <FiPlus size={13} />
@@ -163,15 +191,16 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
                 <span className="mr-2 text-sm text-muted sm:hidden">
                   Subtotal:
                 </span>
-              ₹{(product.offerPrice * product.quantity).toFixed(2)}
+              ₹{Number(product.price) * product.quantity}
               </p>
 
               {/* Delete */}
               <button
+                onClick={() => removeItem(product.id)}
                 type="button"
-                className="flex w-fit cursor-pointer items-center gap-2 text-sm text-error transition hover:opacity-70 sm:mx-auto"
+                className="flex w-fit cursor-pointer items-center gap-2 text-sm !text-red-500 transition hover:opacity-70 sm:mx-auto "
               >
-                <FiTrash2 size={17} />
+                <FiTrash2 size={17} className="text-red-500" />
                 <span className="sm:hidden">Remove</span>
               </button>
             </div>
@@ -209,9 +238,10 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
             Payment Method
           </p>
 
-          <select className="mt-2 w-full cursor-pointer rounded-md border border-border bg-white px-3 py-2.5 text-sm text-text outline-none focus:border-primary">
-            <option value="COD">Cash on Delivery</option>
-            <option value="Online">Online Payment</option>
+          <select className="mt-2 w-full cursor-pointer rounded-md border border-border bg-white px-3 py-2.5 text-sm text-text outline-none focus:border-primary"
+          onChange={(e)=>setPaymentMethod(e.target.value as "cod" | "stripe")}>
+            <option value="cod">Cash on Delivery</option>
+            <option value="stripe">Online Payment</option>
           </select>
         </div>
 
@@ -221,7 +251,7 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
         <div className="space-y-3 text-sm text-muted">
           <p className="flex justify-between">
             <span>Subtotal</span>
-            <span>${subtotal.toFixed(2)}</span>
+            <span>₹{subTotal}</span>
           </p>
 
           <p className="flex justify-between">
@@ -229,13 +259,13 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
             <span className="text-success">
               {shippingFee === 0
                 ? "Free"
-                : `$${shippingFee.toFixed(2)}`}
+                : `₹${shippingFee}`}
             </span>
           </p>
 
           <p className="flex justify-between">
             <span>Tax (2%)</span>
-            <span>${tax.toFixed(2)}</span>
+            <span>₹{tax.toFixed(2)}</span>
           </p>
 
           <hr className="border-border" />
@@ -243,17 +273,19 @@ export default function CheckoutPageComponent({addresses} :CheckoutPageComponent
           <p className="flex justify-between text-lg font-medium text-text">
             <span>Total Amount</span>
             <span className="text-primary">
-            ₹{total.toFixed(2)}
+            ₹{total}
             </span>
           </p>
         </div>
 
         {/* Place Order */}
         <button
+        disabled={isSubmitting || cartItems.length === 0}
           type="button"
+          onClick={handlePlaceOrder}
           className="mt-6 w-full cursor-pointer rounded-lg bg-primary py-3.5 font-medium text-white transition hover:bg-primary-hover"
         >
-          Place Order
+         {paymentMethod === "cod" ? "Place Order" : "Continue to Stripe"}
         </button>
       </div>
     </div>
